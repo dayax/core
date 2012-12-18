@@ -1,0 +1,2 @@
+component.property_undefined = Component property '{0}::{1}' is not defined.
+component.property_read_only = Component property '{0}::{1}' is readonly.
