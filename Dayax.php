@@ -10,11 +10,17 @@
  */
 
 namespace dayax\core;
+
+use dayax\core\ExceptionFactory;
+
 class Dayax
 {
 
-    private static $_cacheDir;
+    private static $cacheDir;
     private static $loader;
+
+    private static $initialized = false;
+    private static $rootDir = false;
 
     public static function getVendorDir()
     {
@@ -23,16 +29,16 @@ class Dayax
 
     public static function setCacheDir($dir)
     {
-        self::$_cacheDir = $dir;
+        self::$cacheDir = $dir;
     }
 
     public static function getCacheDir()
     {
-        if (is_null(self::$_cacheDir)) {
-            self::$_cacheDir = __DIR__.'/../../../cache';
+        if (is_null(self::$cacheDir)) {
+            self::$cacheDir = __DIR__.'/../../../cache';
         }
 
-        return self::$_cacheDir;
+        return self::$cacheDir;
     }
 
     public static function serialize($data,$file=null)
@@ -97,11 +103,35 @@ class Dayax
      */
     public static function getLoader()
     {
+        if(!is_object(self::$loader)){
+            foreach(get_declared_classes() as $class){
+                if(false!==strpos($class,'ComposerAutoloaderInit')){
+                    self::$loader = $class::getLoader();
+                    break;
+                }
+            }
+        }
         return self::$loader;
     }
 
-    public static function setLoader($loader)
+    static public function init($closure = null)
     {
-        self::$loader = $loader;
+        $loader = self::getLoader();
+        $r = new \ReflectionClass($loader);
+
+        $rootDir = realpath(dirname($r->getFileName()).'/../../');
+        self::$rootDir = $rootDir;
+
+        if(is_file($file = $rootDir.'/vendor/autoload_classmap.php')){
+            $map = require_once $file;
+            if(is_array($map)){
+                $loader->addClassMap($map);
+            }
+        }
+
+        ExceptionFactory::register();
+        if(is_callable($closure)){
+            call_user_func($closure);
+        }
     }
 }

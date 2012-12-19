@@ -1,7 +1,5 @@
 <?php
-
-$loader = require_once __DIR__.'/vendor/autoload.php';
-$loader->register();
+require_once __DIR__.'/vendor/autoload.php';
+dayax\core\Dayax::init();
 dayax\core\ExceptionFactory::register();
-dayax\core\Dayax::setLoader($loader);
 ?>
