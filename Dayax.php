@@ -22,6 +22,11 @@ class Dayax
     private static $initialized = false;
     private static $rootDir = false;
 
+    static public function getRootDir()
+    {
+        return self::$rootDir;
+    }
+
     /**
      * @codeCoverageIgnore
      */
@@ -134,13 +139,7 @@ class Dayax
 
         $rootDir = realpath(dirname($r->getFileName()).'/../../');
         self::$rootDir = $rootDir;
-
-        if(is_file($file = $rootDir.'/vendor/autoload_classmap.php')){
-            $map = require_once $file;
-            if(is_array($map)){
-                $loader->addClassMap($map);
-            }
-        }
+        self::$cacheDir = $rootDir.'/cache';
 
         ExceptionFactory::register();
         if(is_callable($closure)){
