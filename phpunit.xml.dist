@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="vendor/autoload.php"
+         bootstrap="autoload.php.dist"
 >
     <testsuites>
         <testsuite name="dayax core library test suite">
