@@ -22,25 +22,36 @@ class Dayax
     private static $initialized = false;
     private static $rootDir = false;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getVendorDir()
     {
-        return realpath(__DIR__.'/../../../vendors');
+        return self::$rootDir.'/vendor';
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function setCacheDir($dir)
     {
         self::$cacheDir = $dir;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getCacheDir()
     {
         if (is_null(self::$cacheDir)) {
             self::$cacheDir = __DIR__.'/../../../cache';
         }
-
         return self::$cacheDir;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function serialize($data,$file=null)
     {
         $serialized = serialize(array($data));
@@ -51,6 +62,9 @@ class Dayax
         return $serialized;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function unserialize($data)
     {
         if (is_file($data)) {
@@ -64,18 +78,10 @@ class Dayax
         return $data[0];
     }
 
-    public static function jsonDecode($source,$assoc=null,$depth=null)
-    {
-        if (is_file($source)) {
-            $source = file_get_contents($source);
-        }
-        $args = func_get_args();
-        array_shift($args);
-        $params = array_merge(array($source),$args);
-
-        return call_user_func_array('json_decode', $params);
-    }
-
+    /**
+     * @param   string $namespace
+     * @return  string A path of namespace
+     */
     public static function getPathOfNamespace($namespace)
     {
         $pos = strrpos($namespace, "\\");
@@ -94,12 +100,13 @@ class Dayax
                         return $dir;
                     }
                 }// end for paths loop
-            }
+            } //@codeCoverageIgnore
         }// end for namespaces loop
     }
 
     /**
      * @return \Composer\Autoload\ClassLoader
+     * @codeCoverageIgnore
      */
     public static function getLoader()
     {
@@ -114,8 +121,14 @@ class Dayax
         return self::$loader;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     static public function init($closure = null)
     {
+        if(true===self::$initialized){
+            return;
+        }
         $loader = self::getLoader();
         $r = new \ReflectionClass($loader);
 
@@ -133,5 +146,6 @@ class Dayax
         if(is_callable($closure)){
             call_user_func($closure);
         }
+        self::$initialized = true;
     }
 }

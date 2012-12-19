@@ -21,9 +21,18 @@ use dayax\core\test\TestCase;
  */
 class DayaxTest extends TestCase
 {
+    /**
+     * @covers \dayax\core\Dayax::init
+     */
     public function testShouldInitTheLoader()
     {
         $this->assertTrue(is_object(Dayax::getLoader()));
+    }
+
+    public function testShouldReturnThePathOfNamespace()
+    {
+        $this->assertTrue(is_dir(Dayax::getPathOfNamespace('dayax\core\resources')));
+        $this->assertTrue(is_file(Dayax::getPathOfNamespace('dayax\core\ExceptionFactory')));
     }
 }
 
