@@ -1,0 +1,4 @@
+custom = id - throw new custom exception
+invalid.argument = id - throw new invalid argument exception
+string = id - throw new string exception
+with.arg = id - throw new exception with argument "{0}" and "{1}"

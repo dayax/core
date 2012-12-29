@@ -8,7 +8,7 @@ namespace %%namespace%%
         {
             $args = func_get_args(); 
             $this->message_code = @$args[0];
-            $message = Message::translateMessage(func_get_args());
+            $message = Message::getInstance()->translateMessage(func_get_args());            
             parent::__construct($message);
         }
         public function getMessageCode()

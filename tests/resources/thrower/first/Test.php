@@ -6,21 +6,31 @@ class Test
 {
     public static function throwCustom()
     {
-        throw new CustomException();
+        throw new CustomException('custom');
     }
 
     public static function throwInvalidArgument()
     {
-        throw new InvalidArgumentException();
+        throw new InvalidArgumentException('invalid.argument');
     }
 
     public static function throwString()
     {
-        throw new StringException();
+        throw new StringException('string');
     }
 
     public static function throwException()
     {
-        throw new Exception();
+        throw new Exception('root');
+    }
+    
+    public static function throwWithArgument($foo,$bar)
+    {
+        throw new WithArgumentException('with.arg',$foo,$bar);
+    }
+    
+    public static function throwUntranslated()
+    {
+        throw new UntranslatedException('untranslated');
     }
 }

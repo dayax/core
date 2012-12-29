@@ -16,166 +16,161 @@ namespace dayax\core;
  *
  * @author Anthonius Munthi <toni.dayax@gmail.com>
  */
-class Message
+class Message extends Component
 {
-    private static $_cacheDir = null;
+    private $cacheDir = null;
 
-    private static $_cached = array();
+    private $cached = array();
 
-    private static $_lang =  'en';
+    private $lang =  'en';
+    
+    private $catalogue = array();
+    
+    private $checksum = array();
 
-    public static function setLanguage($lang)
+    static private $instance = null;    
+    
+    public function __construct()
     {
-        self::$_lang = $lang;
+        
     }
 
-    public static function getLanguage()
+    public function setLanguage($lang)
     {
-        return self::$_lang;
+        $this->lang = substr($lang, 0,2);
+        return $this;
     }
-
-    public static function getCacheDir()
+    
+    public function getLanguage()
     {
-        if (is_null(self::$_cacheDir)) {
-            self::$_cacheDir = Dayax::getCacheDir().DIRECTORY_SEPARATOR. 'messages';
-            if (!is_dir(self::$_cacheDir)) {
-                if (!@mkdir(self::$_cacheDir, 0777, true)) {
-                    throw new Exception(sprintf("Can't create message cache directory. Please ensure that directory '%s' is writable.", dirname(self::$_cacheDir)));
-                }
+        return $this->lang;
+    }
+    
+    public function setCacheDir($dir)
+    {
+        if(!is_dir($dir)){
+            throw new InvalidArgumentException('core.message_cache_dir_invalid', $dir);
+        }
+        $this->cacheDir = $dir;
+    }
+    
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+    
+    public function translateMessage($what,$lang=null)
+    {
+        $dbg = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        
+        $caller = $dbg[1];        
+        if(isset($caller['class'])){
+           $r = new \ReflectionClass($caller['class']);           
+           $exp = explode('\\',$r->getNamespaceName());
+           $namespace = $exp[0];              
+        }
+        
+        $lang = is_null($lang) ? $this->lang:$lang;
+        $cached = $this->cached;
+        $trans = array();
+        if(isset($cached[$namespace])){
+            if(isset($cached[$namespace][$lang])){
+                $trans = $cached[$namespace][$lang];
             }
         }
-
-        return self::$_cacheDir;
-    }
-
-    public static function getCacheFileName($sourceFile)
-    {
-        $file = self::getCacheDir().DIRECTORY_SEPARATOR.hash('crc32',dirname($sourceFile)).DIRECTORY_SEPARATOR.basename($sourceFile,'.txt').'.php';
-        if (!is_dir($dir = dirname($file))) {
-            mkdir($dir,0777,true);
+        $defaultLang = 'en';
+        $defTrans = array();
+        if(isset($cached[$namespace])){
+            $defTrans = $cached[$namespace][$defaultLang];
         }
-        return $file;
-    }
-
-    public static function translateMessage()
-    {
-        $args = debug_backtrace();
-        $sourceDir = self::getMessageDir($args[1]);
-        $file = self::getMessageFile($sourceDir);
-
-        if (!isset(self::$_cached[$file])) {
-            self::loadCache($file);
-        }
-
+        
         $params = func_get_args();
         if (is_array($params[0])) {
             $params = $params[0];
         }
+        
         $key = array_shift($params);
-        $message = isset(self::$_cached[$file][$key]) ? self::$_cached[$file][$key] : $key;
+        $message = $key;
+        if(isset($trans[$key])){
+            $message = $trans[$key];
+        }elseif(isset($defTrans[$key])){
+            $message = $defTrans[$key];
+        }
+        
         $tokens = array();
         for ($i=0;$i<count($params);$i++) {
             $tokens["{".$i."}"] = $params[$i];
         }
-
+        
         return strtr($message,$tokens);
     }
-
-    private static function writeCache($cacheFile,$sourceFile)
+    
+    public function addCatalogue($namespace,$dir)
     {
-        $contents = file($sourceFile);
+        if(!is_dir($dir)){
+            throw new InvalidArgumentException('core.message_catalog_dir_invalid',$namespace,$dir);
+        }
+        $dir = realpath($dir);
+        if(isset($this->catalogue[$namespace]) && $this->catalogue[$namespace]===$dir){
+            return;
+        }
+        $this->catalogue[$namespace] = $dir;      
+        $this->initCatalogue($namespace);
+    }
+    
+    public function hasCatalogue($name)
+    {
+        return isset($this->catalogue[$name]) ? true:false;
+    }
+    
+    private function initCatalogue($namespace)
+    {
+        $dir = $this->catalogue[$namespace];
+        $files = array();       
+        foreach(scandir($dir) as $file){
+            if($file==='.' || $file==='..') continue;
+            $files[] = $dir.DIRECTORY_SEPARATOR.$file;
+        }
+        
         $cached = array();
-        foreach ($contents as $content) {
-            if(trim($content)==='') continue;
-            $exp = explode("=", $content);
-            array_walk($exp, create_function('&$item', '$item=trim($item);'));
-            list($key, $msg) = $exp;
-            $cached[$key] = $msg;
+        foreach($files as $file){
+            $contents = @file($file);
+            $lang = strtr(basename($file),array(
+                '.txt'=>'',
+                'messages'=>'',
+                '.'=>'',
+            ));
+            if($lang===''){
+                $lang = 'en';
+            }
+            $cached[$lang] = array();
+            array_walk($contents, create_function('&$item', '$item=trim($item);'));            
+            foreach($contents as $content){
+                $exp = explode("=",$content);
+                array_walk($exp, create_function('&$item', '$item=trim($item);'));
+                list($key,$msg) = $exp;
+                $cached[$lang][$key] = $msg;
+            }//end foreach contents
+            
+            //calculate checksum foreach file
+            $cname = md5($file);           
+            $this->checksum[$namespace][$cname] = md5_file($file);            
+        }//end foreach files
+        
+        if(!isset($this->cached[$namespace])){
+            $this->cached[$namespace] = array();
         }
-        $data = var_export($cached,true);
-        $tpl = <<<EOC
-<?php
-
-/*
- * Messages cache for file  : %s
- * generated at             : %s
- */
-
-self::\$_cached["%s"] = %s;
-EOC;
-        $contents = sprintf($tpl,$sourceFile,date('Y-m-d h:m:s'),$sourceFile,$data);
-        file_put_contents($cacheFile, $contents,LOCK_EX);
+        $this->cached[$namespace] = array_merge($this->cached[$namespace],$cached);                
     }
-
-    private static function getMessageDir($caller)
+    
+    /**
+     * @return \dayax\core\Message
+     */
+    static public function getInstance()
     {
-        $default = __DIR__ . '/resources/messages';
-        // try to found foo\bar\resource or foo\resource first
-        if (isset($caller['object']) || is_object($caller['class'])) {
-            $r = isset($caller['object']) ? new \ReflectionClass($caller['object']):new \ReflectionClass($caller['class']);
-
-            //try namespace\class first
-            $exp = explode("\\",$r->getNamespaceName());
-            $c = count($exp);
-            for ($i=0;$i<$c;$i++) {
-                //echo implode("\\",$exp).'\\resources\\messages'."\n";
-                $path = Dayax::getPathOfNamespace(implode("\\",$exp).'\\resources\\messages');
-
-                if (is_dir($path)) {
-                    return $path;
-                }
-                array_pop($exp);
-            }
-
-            $baseDir = dirname($r->getFileName());
-            if (is_dir($path = $baseDir . '/resources/messages')) {
-                return realpath($path);
-            }
-
-            // not found? then we should use foo\namespace\resource
-            $exp = explode("\\",$r->getNamespaceName());
-            $cDir = realpath($baseDir);
-
-            for ($i=0;$i<count($exp);$i++) {
-                $dir = $cDir.'/resources/messages';
-                if (is_dir($path=realpath($dir))) {
-                    return $path;
-                }
-                $cDir = $cDir.'/..';
-            }
-            // not found? we should try the root package of namespace foo;
-            $root = $exp[0];
-            $paths = Dayax::getLoader()->getPrefixes();
-            $paths = isset($paths[$root]) ? $paths[$root]:array();
-            foreach ($paths as $dir) {
-                if (is_dir($path=$dir.DIRECTORY_SEPARATOR.$root.'/resources/messages')) {
-                    return $path;
-                }
-            }
+        if(is_null(self::$instance)){
+            self::$instance = new self();
         }
-
-        return $default;
+        return self::$instance;
     }
-
-    private static function getMessageFile($dir)
-    {
-        if (is_file($file = $dir . DIRECTORY_SEPARATOR . 'messages.' . self::$_lang . '.txt')) {
-            echo $file;
-            return $file;
-        } elseif (is_file($file = $dir . DIRECTORY_SEPARATOR . 'messages.txt')) {
-            return $file;
-        } else {
-            throw new Exception("messages file not exists ".$file);
-        }
-    }
-
-    private static function loadCache($sourceFile)
-    {
-        $cacheFile = self::getCacheFileName($sourceFile);
-        if (!is_file($cacheFile) || (filemtime($sourceFile) > filemtime($cacheFile))) {
-            self::writeCache($cacheFile,$sourceFile);
-        }
-        include($cacheFile);
-    }
-
 }

@@ -1,0 +1,5 @@
+custom = throw new custom exception
+invalid.argument = throw new invalid argument exception
+string = throw new string exception
+with.arg = throw new exception with argument "{0}" and "{1}"
+untranslated = untranslated message
