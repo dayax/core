@@ -20,7 +20,8 @@ class EventHandler
     private $prioCount = array();
     
     public function add($name,$handler,$priority=null)
-    {        
+    {
+        $name = strtolower($name);
         if(!is_callable($handler)){
             throw new InvalidArgumentException('core.event_handler_uncallable');
         }
@@ -42,10 +43,8 @@ class EventHandler
         if(!isset($h[$name])){
             return false;
         }
-        if(!is_array($h[$name]) || count($h[$name])===0){
-            return false;
-        }
-        return true;
+        
+        return count($h[$name]) > 0 ? true:false;
     }
     
     private function sortHandler($name)

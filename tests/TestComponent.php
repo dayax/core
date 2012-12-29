@@ -2,13 +2,33 @@
 
 namespace dayax\core\tests;
 
-class TestComponent
+use dayax\core\Component;
+
+class TestComponent extends Component
 {
     public $foo = null;
     public $bar = null;
     
     public $param1 = null;
     public $param2 = null;
+    
+    private $prop1 = null;
+    private $readOnlyProp = null;
+    
+    public function setProp1($value)
+    {
+        $this->prop1 = $value;
+    }
+    
+    public function getProp1()
+    {
+        return $this->prop1;
+    }
+    
+    public function getReadOnlyProp()
+    {
+        return $this->readOnlyProp;
+    }
     
     public function onEventA()
     {

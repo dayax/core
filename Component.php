@@ -11,7 +11,7 @@
 
 namespace dayax\core;
 
-use dayax\component\EventHandler;
+use dayax\core\EventHandler;
 
 /**
  * Component Class.
@@ -20,14 +20,25 @@ use dayax\component\EventHandler;
  */
 abstract class Component
 {
+    /**
+     * @var \dayax\core\EventHandler
+     */
     private $eventHandler;
     
+    /**
+     * @return \dayax\core\EventHandler
+     */
     public function getEventHandler()
     {
         if(!is_object($this->eventHandler)){                
             $this->eventHandler = new EventHandler();
         }
         return $this->eventHandler;
+    }
+    
+    public function addHandler($name,$handler,$priority=null)
+    {
+        $this->getEventHandler()->add($name, $handler,$priority);
     }
     
     public function __get($name)
@@ -38,30 +49,31 @@ abstract class Component
             return $this->$getter();
         } elseif (strncasecmp($name,'on',2)===0) {
             if (!method_exists($this,$name)) {
-                throw new InvalidOperationException('component.event_undefined',get_class($this),$name);
+                throw new InvalidOperationException('core.event_undefined',get_class($this),$name);
             }
             $name=strtolower($name);
-            if (!isset($this->_handlers[$name])) {
-                $this->_handlers[$name]=array();
+            if (!$this->getEventHandler()->hasEvent($name)) {
+                return array();                
             }
-
-            return $this->_handlers[$name];
+            return $this->getEventHandler()->getHandlers($name);
         }
-        throw new InvalidOperationException('component.property_undefined',get_class($this),$name);
+        throw new InvalidOperationException('core.property_undefined',get_class($this),$name);
     }
 
     public function __set($name,$value)
     {
         $setter = 'set'.$name;
-        $getter = 'get'.$name;
-        if (method_exists($this, $setter)) {
+        $getter = 'get'.$name;        
+        if (method_exists($this, $setter)) {            
             $this->$setter($value);
         } elseif (strncasecmp($name,'on',2)===0) {
+            $name = strtolower($name);
             $this->addHandler($name,$value);
         } elseif (method_exists($this, $getter)) {
-            throw new InvalidOperationException('component.property_read_only',get_class($this),$name);
+            throw new InvalidOperationException('core.property_read_only',get_class($this),$name);
         } else {
-            throw new InvalidOperationException('component.property_undefined',get_class($this),$name);
+            throw new InvalidOperationException('core.property_undefined',get_class($this),$name);
         }
     }
+
 }
