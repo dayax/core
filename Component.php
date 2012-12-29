@@ -41,6 +41,18 @@ abstract class Component
         $this->getEventHandler()->add($name, $handler,$priority);
     }
     
+    public function canGetProperty($name)
+    {
+        return method_exists($this, 'get'.$name);
+    }
+    
+    public function hasProperty($name)
+    {
+        $setter = 'set'.$name;
+        $getter = 'get'.$name;
+        return method_exists($this,$setter) || method_exists($this,$getter);
+    }
+    
     public function __get($name)
     {
         $getter = 'get'.$name;
