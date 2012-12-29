@@ -23,10 +23,11 @@ class ExceptionFactory extends \Exception
         'dayax',
     );
 
-    private static $extends = array();
-
     private static $template = null;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function register()
     {
         $autoloads = spl_autoload_functions();
@@ -51,6 +52,9 @@ class ExceptionFactory extends \Exception
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function addPackage($name)
     {
         if (!in_array($name, self::$packages)) {
@@ -61,20 +65,18 @@ class ExceptionFactory extends \Exception
     public static function loadClass($class)
     {
         if (false === strpos($class, "\\") || false === strpos($class, 'Exception')) {
-            return;
+            return;//@codeCoverageIgnore
         }
 
         $exp = explode("\\",$class);
         if (!in_array($exp[0], self::$packages)) {
-            return;
+            return;//@codeCoverageIgnore
         }
         $namespace = substr($class, 0, strrpos($class, '\\'));
         $eclass    = $exp[count($exp) - 1];
 
         $extend = "\Exception";
-        if (isset(self::$extends[$eclass])) {
-            $extend = self::$extends[$eclass];
-        } elseif (isset(self::$splClasses[$eclass])) {
+        if (isset(self::$splClasses[$eclass])) {
             $extend = '\\'.self::$splClasses[$eclass];
         }
 
@@ -87,14 +89,5 @@ class ExceptionFactory extends \Exception
         $definition = strtr(self::$template,$replacement);
 
         eval($definition);
-    }
-
-    private static function getExtendClass($class)
-    {
-        $exp = explode("\\", $class);
-        if (!in_array($exp[0], self::$_packages)) {
-            return;
-        }
-
     }
 }
