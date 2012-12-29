@@ -32,7 +32,7 @@ class Message extends Component
     
     public function __construct()
     {
-        
+        $this->addCatalogue('dayax', __DIR__.'/resources/messages');
     }
 
     public function setLanguage($lang)
