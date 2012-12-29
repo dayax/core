@@ -11,6 +11,8 @@
 
 namespace dayax\core;
 
+use dayax\component\EventHandler;
+
 /**
  * Component Class.
  *
@@ -18,8 +20,16 @@ namespace dayax\core;
  */
 abstract class Component
 {
-    private $_handlers = array();
-
+    private $eventHandler;
+    
+    public function getEventHandler()
+    {
+        if(!is_object($this->eventHandler)){                
+            $this->eventHandler = new EventHandler();
+        }
+        return $this->eventHandler;
+    }
+    
     public function __get($name)
     {
         $getter = 'get'.$name;
