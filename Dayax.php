@@ -81,33 +81,7 @@ class Dayax
         $data = unserialize($data);
 
         return $data[0];
-    }
-
-    /**
-     * @param   string $namespace
-     * @return  string A path of namespace
-     */
-    public static function getPathOfNamespace($namespace)
-    {
-        $pos = strrpos($namespace, "\\");
-        $ns = substr($namespace, 0, $pos);
-        $class = substr($namespace, $pos + 1);
-
-        $prefixes = self::getLoader()->getPrefixes();
-        foreach ($prefixes as $package => $paths) {
-            if (false !== strpos($ns, $package)) {
-                foreach ($paths as $path) {
-                    $dir = $path.DIRECTORY_SEPARATOR . $ns . DIRECTORY_SEPARATOR . $class;
-                    $dir = str_replace("\\", DIRECTORY_SEPARATOR, $dir);
-                    if (is_file($file = $dir . '.php')) {
-                        return $file;
-                    } elseif (is_dir($dir)) {
-                        return $dir;
-                    }
-                }// end for paths loop
-            } //@codeCoverageIgnore
-        }// end for namespaces loop
-    }
+    }    
 
     /**
      * @return \Composer\Autoload\ClassLoader
