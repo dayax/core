@@ -21,6 +21,9 @@ class MessageTest extends TestCase
     public function testCanSetAndGetCacheDir()
     {
         $dir = __DIR__.'/resources/cache';
+        if(!is_dir($dir)){
+            mkdir($dir,true);
+        }
         $m = new Message();
         $m->CacheDir = $dir;
         $this->assertEquals($dir,$m->CacheDir);
