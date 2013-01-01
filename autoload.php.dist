@@ -1,4 +1,4 @@
 <?php
 require_once __DIR__.'/vendor/autoload.php';
-dayax\core\Dayax::init();
+\dayax\core\ExceptionFactory::register();
 ?>
