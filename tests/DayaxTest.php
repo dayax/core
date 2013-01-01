@@ -17,7 +17,7 @@ use dayax\core\test\TestCase;
 /**
  * Description of DayaxTest
  *
- * @author Anthonius Munthi <toni.munthi@gmail.com>
+ * @author Anthonius Munthi <me@itstoni.com>
  */
 class DayaxTest extends TestCase
 {

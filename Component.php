@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the dayax project.
+ * This file is part of the dayax package.
  *
  * (c) Anthonius Munthi <toni.dayax@gmail.com>
  *
