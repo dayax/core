@@ -9,7 +9,6 @@ class TranslatorTest extends TestCase
 {
     private $lang;
 
-
     public function testCanSetAndGetLanguage()
     {
         $m = new Translator();

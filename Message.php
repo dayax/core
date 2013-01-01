@@ -52,7 +52,6 @@ class Message
         if(!is_callable($callback)){
             throw new UnexistentMethodException('core.message_undefined_method',__CLASS__,$name);
         }
-
         return call_user_func_array($callback, $arguments);
     }
 }

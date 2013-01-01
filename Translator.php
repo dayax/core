@@ -140,10 +140,6 @@ class Translator extends Component
                 list($key,$msg) = $exp;
                 $cached[$lang][$key] = $msg;
             }//end foreach contents
-
-            //calculate checksum foreach file
-            $cname = md5($file);
-            $this->checksum[$namespace][$cname] = md5_file($file);
         }//end foreach files
 
         if(!isset($this->cached[$namespace])){
