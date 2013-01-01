@@ -13,6 +13,9 @@ namespace dayax\core;
 
 use dayax\core\ExceptionFactory;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Dayax
 {
 
@@ -81,7 +84,7 @@ class Dayax
         $data = unserialize($data);
 
         return $data[0];
-    }    
+    }
 
     /**
      * @return \Composer\Autoload\ClassLoader

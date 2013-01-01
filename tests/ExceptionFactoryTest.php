@@ -5,6 +5,9 @@ namespace dayax\core\tests;
 use dayax\core\test\TestCase;
 use dayax\core\ExceptionFactory;
 
+/**
+ * @covers dayax\core\ExceptionFactory
+ */
 class ExceptionFactoryTest extends TestCase
 {
     public static function setUpBeforeCLass()
