@@ -2,18 +2,18 @@
 
 namespace dayax\core\tests;
 
-use dayax\core\Message;
+use dayax\core\Translator;
 use dayax\core\test\TestCase;
 use thrower\first\Test as Thrower;
 
-class MessageTest extends TestCase
+class TranslatorTest extends TestCase
 {
     private $lang;
         
     
     public function testCanSetAndGetLanguage()
     {       
-        $m = new Message();
+        $m = new Translator();
         $m->setLanguage('id');
         $this->assertEquals('id',$m->Language);
     }
@@ -24,14 +24,14 @@ class MessageTest extends TestCase
         if(!is_dir($dir)){
             mkdir($dir,true);
         }
-        $m = new Message();
+        $m = new Translator();
         $m->CacheDir = $dir;
         $this->assertEquals($dir,$m->CacheDir);
     }
     
     public function testCanLoadCatalogue()
     {
-        $m = new Message();
+        $m = new Translator();
         $m->addCatalogue('foo',__DIR__.'/resources/messages');
         $this->assertTrue($m->hasCatalogue('foo'));
     }
@@ -41,7 +41,7 @@ class MessageTest extends TestCase
      */
     public function testShouldThrowOnInvalidCatalogueDir()
     {
-        $m = new Message();
+        $m = new Translator();
         $m->addCatalogue('foo','foo');
     }
     
@@ -50,22 +50,22 @@ class MessageTest extends TestCase
      */
     public function testShouldThrowOnInvalidCacheDir()
     {
-        $m = new Message();
+        $m = new Translator();
         $m->CacheDir = 'foo';
     }
     
     /**
-     * @dataProvider getTestTranslateMessage
+     * @dataProvider getTestTranslate
      */
-    public function testTranslateMessage($exception,$method,$message,$lang="en",$parameter=array())
+    public function testTranslate($exception,$method,$message,$lang="en",$parameter=array())
     {
-        Message::getInstance()->setLanguage($lang);
-        Message::getInstance()->addCatalogue('thrower', __dir__.'/resources/messages');
+        Translator::getInstance()->setLanguage($lang);
+        Translator::getInstance()->addCatalogue('thrower', __dir__.'/resources/messages');
         $this->setExpectedException('thrower\first\\'.$exception,$message);       
         call_user_func_array(array('thrower\first\Test',$method),$parameter);       
     }
     
-    public function getTestTranslateMessage()
+    public function getTestTranslate()
     {
         return array(
             array('InvalidArgumentException','throwInvalidArgument','throw new invalid argument exception'),
