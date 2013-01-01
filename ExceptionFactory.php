@@ -16,7 +16,7 @@ namespace dayax\core;
  *
  * @author Anthonius Munthi <me@itstoni.com>
  */
-class ExceptionFactory extends \Exception
+class ExceptionFactory
 {
     private static $splClasses = null;
     private static $packages = array(
@@ -25,13 +25,12 @@ class ExceptionFactory extends \Exception
 
     private static $template = null;
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function register()
     {
         $autoloads = spl_autoload_functions();
-        $callback = array('dayax\core\ExceptionFactory', 'loadClass');
+        $callback = array(__CLASS__, 'loadClass');
+
+        //@codeCoverageIgnoreStart
         if (!in_array($callback, $autoloads)) {
             spl_autoload_register($callback);
         }
@@ -50,16 +49,19 @@ class ExceptionFactory extends \Exception
         if (is_null(self::$template)) {
             self::$template = file_get_contents(__DIR__.'/resources/exception.tpl',LOCK_EX);
         }
+        //@codeCoverageIgnoreEnd
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public static function addPackage($name)
     {
         if (!in_array($name, self::$packages)) {
             self::$packages[] = $name;
         }
+    }
+
+    public static function hasPackage($name)
+    {
+        return in_array($name, self::$packages);
     }
 
     public static function loadClass($class)
@@ -69,7 +71,7 @@ class ExceptionFactory extends \Exception
         }
 
         $exp = explode("\\",$class);
-        if (!in_array($exp[0], self::$packages)) {
+        if (false===self::hasPackage($exp[0])) {
             return;//@codeCoverageIgnore
         }
         $namespace = substr($class, 0, strrpos($class, '\\'));

@@ -5,9 +5,11 @@ namespace dayax\core\tests;
 use dayax\core\test\TestCase;
 use dayax\core\ExceptionFactory;
 
-/**
- * @covers dayax\core\ExceptionFactory
- */
+class FooFactory extends ExceptionFactory
+{
+
+}
+
 class ExceptionFactoryTest extends TestCase
 {
     public static function setUpBeforeCLass()
@@ -40,5 +42,12 @@ class ExceptionFactoryTest extends TestCase
             array('thrower\\first\\Test::throwCustom','thrower\\first\\CustomException'),
             array('thrower\\first\\second\\Test::throwException','thrower\\first\\second\\Exception'),
         );
+    }
+
+    public function testRegister()
+    {
+        FooFactory::register();
+        FooFactory::addPackage('foo');
+        $this->assertTrue(FooFactory::hasPackage('foo'));
     }
 }
