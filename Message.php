@@ -1,14 +1,32 @@
 <?php
 
+/*
+ * This file is part of the dayax package.
+ *
+ * (c) Anthonius Munthi <me@itstoni.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace dayax\core;
 
 /**
  * Provide Message service
  *
- * @method void addCatalog(string $namespace,string $directory) Description
+ *
+ * @method void addCatalog(string $namespace,string $directory) Add a new catalog to load
+ *
+ * @author Anthonius Munthi <me@itstoni.com>
  */
 class Message
 {
+    /**
+     * Translate a message
+     * @param   string  $message
+     * @param   array   $parameters
+     * @return  string  Translated message
+     */
     static public function translate($message,Array $parameters=array())
     {
         $trace = debug_backtrace();

@@ -14,7 +14,10 @@ namespace dayax\core;
 use dayax\core\ExceptionFactory;
 
 /**
+ * Dayax Utility Class
+ * @author Anthonius Munthi <me@itstoni.com>
  * @codeCoverageIgnore
+ * @todo Remove this class
  */
 class Dayax
 {
