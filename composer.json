@@ -24,7 +24,7 @@
             "dayax\\core": ""
         },
 	"files": [
-            "vendor/dayax/core/dayax/core/test/ExceptionCode.php"
+            "dayax/core/test/ExceptionCode.php"
         ]
     },
     "extra": {
