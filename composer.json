@@ -22,7 +22,10 @@
     "autoload":{
         "psr-0":{
             "dayax\\core": ""
-        }
+        },
+	"files": [
+            "test/ExceptionCode.php"
+        ]
     },
     "extra": {
         "branch-alias": {
