@@ -1,5 +1,6 @@
 <?php
 
+if(class_exists('PHPUnit_Framework_Constraint')){
 /**
  * @codeCoverageIgnore
  */
@@ -63,4 +64,5 @@ class PHPUnit_Framework_Constraint_ExceptionCode extends \PHPUnit_Framework_Cons
     {
         return 'exception code is ';
     }
+}
 }
