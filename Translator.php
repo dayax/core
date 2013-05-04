@@ -135,7 +135,9 @@ class Translator extends Component
             $cached[$lang] = array();
             array_walk($contents, create_function('&$item', '$item=trim($item);'));
             foreach($contents as $content){
-                $exp = explode("=",$content);
+                if($content=='') continue;
+                
+                $exp = explode("=",$content);               
                 array_walk($exp, create_function('&$item', '$item=trim($item);'));
                 list($key,$msg) = $exp;
                 $cached[$lang][$key] = $msg;
