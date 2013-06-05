@@ -32,8 +32,8 @@ class MessageTest extends TestCase
     {
         Message::setCacheDir(__DIR__.'/resources/cache');
         $this->assertEquals(__DIR__.'/resources/cache',  Translator::getInstance()->getCacheDir());
-    }
-
+    }    
+    
     public function testShouldReturnKeyWhenUntranslated()
     {
         $this->assertEquals('unknown.key',Message::translate('unknown.key'));

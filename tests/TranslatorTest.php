@@ -33,7 +33,7 @@ class TranslatorTest extends TestCase
         $m->addCatalog('foo',__DIR__.'/resources/messages');
         $this->assertTrue($m->hasCatalog('foo'));
     }
-
+    
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -59,7 +59,8 @@ class TranslatorTest extends TestCase
     public function testTranslate($exception,$method,$message,$lang="en",$parameter=array())
     {
         Translator::getInstance()->setLanguage($lang);
-        Translator::getInstance()->addCatalog('thrower', __dir__.'/resources/messages');
+        Translator::getInstance()->addCatalog('thrower', __DIR__.'/resources/messages');
+        Translator::getInstance()->addCatalog('thrower', __DIR__.'/resources/messages2');
         $this->setExpectedException('thrower\first\\'.$exception,$message);
         call_user_func_array(array('thrower\first\Test',$method),$parameter);
     }
@@ -78,6 +79,10 @@ class TranslatorTest extends TestCase
             array('WithArgumentException','throwWithArgument','id - throw new exception with argument "foo" and "bar"','id',array('foo','bar')),
 
             array('UntranslatedException','throwUntranslated','untranslated message','id'),
+            
+            // should load from catalog 2
+            array('TestException','throwWithCatalog2','Dari Catalog 2','id'),
+            array('TestException','throwWithCatalog2','From Catalog 2','en'),
         );
     }
 }

@@ -59,7 +59,7 @@ class Translator extends Component
         return $this->cacheDir;
     }
 
-    public function translate($message,$params,$catalog=null,$lang=null)
+    public function translate($message,$params=array(),$catalog=null,$lang=null)
     {
         $lang = is_null($lang) ? $this->lang:$lang;
         $cached = $this->cached;
@@ -103,8 +103,12 @@ class Translator extends Component
         if(isset($this->catalog[$namespace]) && $this->catalog[$namespace]===$dir){
             return;//@codeCoverageIgnore
         }
-        $this->catalog[$namespace] = $dir;
-        $this->initCatalog($namespace);
+        
+        if(!isset($this->catalog[$namespace])){
+            $this->catalog[$namespace] = array();
+        }
+        $this->catalog[$namespace][] = $dir;
+        $this->initCatalog($namespace,$dir);
     }
 
     public function hasCatalog($name)
@@ -112,16 +116,17 @@ class Translator extends Component
         return isset($this->catalog[$name]) ? true:false;
     }
 
-    private function initCatalog($namespace)
-    {
-        $dir = $this->catalog[$namespace];
+    private function initCatalog($namespace,$dir)
+    {        
         $files = array();
         foreach(scandir($dir) as $file){
             if($file==='.' || $file==='..') continue;
             $files[] = $dir.DIRECTORY_SEPARATOR.$file;
         }
 
-        $cached = array();
+        if(!isset($this->cached[$namespace])){
+            $this->cached[$namespace] = array();
+        }        
         foreach($files as $file){
             $contents = @file($file);
             $lang = strtr(basename($file),array(
@@ -140,14 +145,10 @@ class Translator extends Component
                 $exp = explode("=",$content);               
                 array_walk($exp, create_function('&$item', '$item=trim($item);'));
                 list($key,$msg) = $exp;
-                $cached[$lang][$key] = $msg;
+                $this->cached[$namespace][$lang][$key] = $msg;
             }//end foreach contents
         }//end foreach files
-
-        if(!isset($this->cached[$namespace])){
-            $this->cached[$namespace] = array();
-        }
-        $this->cached[$namespace] = array_merge($this->cached[$namespace],$cached);
+        
     }
 
     /**

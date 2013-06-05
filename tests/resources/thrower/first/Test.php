@@ -33,4 +33,9 @@ class Test
     {
         throw new UntranslatedException('untranslated');
     }
+    
+    public static function throwWithCatalog2()
+    {
+        throw new TestException('catalog2');
+    }
 }
