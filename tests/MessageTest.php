@@ -27,6 +27,12 @@ class MessageTest extends TestCase
         Message::addCatalog('thrower',__DIR__.'/resources/messages');
         $this->assertTrue(Translator::getInstance()->hasCatalog('thrower'));
     }
+    
+    public function testCanSetCacheDir()
+    {
+        Message::setCacheDir(__DIR__.'/resources/cache');
+        $this->assertEquals(__DIR__.'/resources/cache',  Translator::getInstance()->getCacheDir());
+    }
 
     public function testShouldReturnKeyWhenUntranslated()
     {

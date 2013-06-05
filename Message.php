@@ -16,7 +16,7 @@ namespace dayax\core;
  *
  *
  * @method void addCatalog(string $namespace,string $directory) Add a new catalog to load
- *
+ * @method void setCacheDir(string $dir) Add a new cache directory
  * @author Anthonius Munthi <me@itstoni.com>
  */
 class Message
@@ -45,7 +45,7 @@ class Message
     {
         $translator = Translator::getInstance();
         $callback = array();
-        if($name==='addCatalog'){
+        if(in_array($name,array('addCatalog','setCacheDir'))){
             $callback = array($translator,$name);
         }
 
