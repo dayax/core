@@ -36,6 +36,7 @@ class Test
     
     public static function throwWithCatalog2()
     {
-        throw new TestException('catalog2');
+        $message = \dayax\core\Translator::getInstance()->translate('catalog2',array('thrower'));
+        throw new TestException($message);
     }
 }
