@@ -26,5 +26,11 @@
 	"files": [
             "dayax/core/test/ExceptionCode.php"
         ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev",
+            "dev-develop": "1.1-dev"
+        }
     }
 }
